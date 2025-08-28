@@ -78,6 +78,9 @@ def information_gain(y, col, criterion):
         parent_impurity = entropy(y)
     elif criterion in ["misclassification_error", "error"]:
         parent_impurity = misclassification_error(y)
+    elif criterion in ["mse"]:
+        parent_mean = np.mean(y)
+        parent_impurity = np.mean((y - parent_mean) ** 2)
     else:
         raise ValueError(f"Invalid criterion: {criterion}")
 
@@ -91,6 +94,10 @@ def information_gain(y, col, criterion):
             weighted_impurity += (count / len(y)) * entropy(subset)
         elif criterion in ["misclassification_error", "error"]:
             weighted_impurity += (count / len(y)) * misclassification_error(subset)
+        elif criterion in ["mse"]:
+            if len(subset) > 0:
+                mean_subset = np.mean(subset)
+                weighted_impurity += (count / len(y)) * np.mean((subset - mean_subset) ** 2)
 
     return parent_impurity - weighted_impurity
 
@@ -148,3 +155,4 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value):
         X_left, y_left = X[left_mask], y[left_mask]
         X_right, y_right = X[right_mask], y[right_mask]
         return (X_left, y_left), (X_right, y_right)
+
